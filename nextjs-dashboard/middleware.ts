@@ -17,6 +17,11 @@ export default auth((req) => {
     }
 
     if (!isAuth) {
+        // Allow dashboard to be viewed without sign-in for this deployment fix.
+        if (req.nextUrl.pathname.startsWith('/dashboard')) {
+            return;
+        }
+
         let from = req.nextUrl.pathname;
         if (req.nextUrl.search) {
             from += req.nextUrl.search;
