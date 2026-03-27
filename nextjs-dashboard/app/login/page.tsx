@@ -1,6 +1,5 @@
 import AcmeLogo from '@/app/ui/acme-logo';
 import LoginForm from '@/app/ui/login-form';
-import OAuthButtons from '@/app/ui/oauth-buttons';
 import { lusitana } from '@/app/ui/fonts';
 
 export default function LoginPage() {
@@ -16,21 +15,6 @@ export default function LoginPage() {
 
         {/* Email / password form */}
         <LoginForm />
-
-        {/* Divider */}
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t border-gray-300" />
-          </div>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className={`${lusitana.className} bg-gray-50 px-3 text-gray-500`}>
-              Or continue with
-            </span>
-          </div>
-        </div>
-
-        {/* OAuth buttons */}
-        <OAuthButtons />
       </div>
     </main>
   );

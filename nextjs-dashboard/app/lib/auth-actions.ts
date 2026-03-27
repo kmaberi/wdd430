@@ -1,35 +1,20 @@
 'use server';
 
 import { signIn } from '@/auth';
+import { AuthError } from 'next-auth';
 
-export async function signInWithGoogle() {
-  await signIn('google', { redirectTo: '/dashboard' });
-}
-
-export async function signInWithGitHub() {
-  await signIn('github', { redirectTo: '/dashboard' });
-}
-
-export async function signInWithMicrosoft() {
-  await signIn('microsoft-entra-id', { redirectTo: '/dashboard' });
-}
-
-export async function signInWithDiscord() {
-  await signIn('discord', { redirectTo: '/dashboard' });
-}
-
-export async function signInWithCredentials(formData: FormData) {
-  const email = formData.get('email') as string;
-  const password = formData.get('password') as string;
-
+export async function signInWithCredentials(prevState: string | undefined, formData: FormData) {
   try {
-    await signIn('credentials', {
-      email,
-      password,
-      redirectTo: '/dashboard',
-    });
+    await signIn('credentials', formData);
   } catch (error) {
-    // Handle authentication errors
+    if (error instanceof AuthError) {
+      switch (error.type) {
+        case 'CredentialsSignin':
+          return 'Invalid credentials.';
+        default:
+          return 'Something went wrong.';
+      }
+    }
     throw error;
   }
 }

@@ -1,11 +1,9 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
-
-export default function middleware(req: NextRequest) {
-    // For now, allow all routes through. This avoids using server-only authentication code in edge runtime.
-    return NextResponse.next();
-}
-
+import NextAuth from 'next-auth';
+import { authConfig } from './auth.config';
+ 
+export default NextAuth(authConfig).auth;
+ 
 export const config = {
-    matcher: ['/((?!api|_next/static|_next/image|.*\\.png$).*)'],
+  // https://nextjs.org/docs/app/building-your-application/routing/middleware#matcher
+  matcher: ['/((?!api|_next/static|_next/image|.*\\.png$).*)'],
 };

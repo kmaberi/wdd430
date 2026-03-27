@@ -1,41 +1,41 @@
 import NextAuth from 'next-auth';
-import Google from 'next-auth/providers/google';
-import GitHub from 'next-auth/providers/github';
-import MicrosoftEntraID from 'next-auth/providers/microsoft-entra-id';
-import Discord from 'next-auth/providers/discord';
+import { authConfig } from './auth.config';
 import Credentials from 'next-auth/providers/credentials';
+import { z } from 'zod';
+import { sql } from '@vercel/postgres';
+import type { User } from '@/app/lib/definitions';
+import bcrypt from 'bcrypt';
 
+async function getUser(email: string): Promise<User | undefined> {
+  try {
+    const user = await sql<User>`SELECT * FROM users WHERE email=${email}`;
+    return user.rows[0];
+  } catch (error) {
+    console.error('Failed to fetch user:', error);
+    throw new Error('Failed to fetch user.');
+  }
+}
+ 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  ...authConfig,
   providers: [
-    Google,
-    GitHub,
-    MicrosoftEntraID({
-      // Tenant ID is optional in this app; default to 'common'.
-      tenantId: process.env.AUTH_MICROSOFT_ENTRA_ID_TENANT_ID ?? 'common',
-    } as any),
-    Discord,
     Credentials({
-      name: 'credentials',
-      credentials: {
-        email: { label: 'Email', type: 'email' },
-        password: { label: 'Password', type: 'password' },
-      },
       async authorize(credentials) {
-        if (
-          credentials?.email === 'kennethmaberi@gmail.com' &&
-          credentials?.password === '20maberi22'
-        ) {
-          return {
-            id: '1',
-            email: 'kennethmaberi@gmail.com',
-            name: 'Kenneth Maberi',
-          };
+        const parsedCredentials = z
+          .object({ email: z.string().email(), password: z.string().min(6) })
+          .safeParse(credentials);
+ 
+        if (parsedCredentials.success) {
+          const { email, password } = parsedCredentials.data;
+          const user = await getUser(email);
+          if (!user) return null;
+          const passwordsMatch = await bcrypt.compare(password, user.password);
+ 
+          if (passwordsMatch) return user;
         }
+ 
         return null;
       },
     }),
   ],
-  pages: {
-    signIn: '/login',
-  },
 });
