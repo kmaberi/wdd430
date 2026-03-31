@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { lusitana } from '@/app/ui/fonts';
 import {
   AtSymbolIcon,
@@ -62,6 +63,12 @@ export default function LoginForm() {
           </div>
         </div>
         <LoginButton />
+        <div className="mt-3 text-sm text-gray-600">
+          Don’t have an account?{' '}
+          <Link href="/signup" className="font-medium text-blue-600 hover:text-blue-500">
+            Create one now.
+          </Link>
+        </div>
         <div
           className="flex h-8 items-end space-x-1"
           aria-live="polite"
