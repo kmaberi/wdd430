@@ -1,6 +1,14 @@
 import SideNav from '@/app/ui/dashboard/sidenav';
- 
-export default function Layout({ children }: { children: React.ReactNode }) {
+import getServerSession from 'next-auth';
+import { redirect } from 'next/navigation';
+import { authConfig } from '@/auth.config';
+
+export default async function Layout({ children }: { children: React.ReactNode }) {
+  const session = await getServerSession(authConfig);
+  if (!session) {
+    redirect('/login');
+  }
+
   return (
     <div className="flex h-screen flex-col md:flex-row md:overflow-hidden">
       <div className="w-full flex-none md:w-64">
